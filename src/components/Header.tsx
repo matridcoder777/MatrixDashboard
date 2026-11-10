@@ -58,7 +58,9 @@ export const Header: React.FC<HeaderProps> = ({
 • Overhead & Support: ${metrics.totalOps} (${metrics.opsPct}%) [PM: ${state.pm}, BA: ${state.ba}, Sales/Ops: ${metrics.sales + metrics.hrAcc}]
 • Dev-to-Management Ratio: ${metrics.devToMgmtRatio}:1
 • Estimated Monthly Revenue: $${formatNumber(metrics.totalProjectedRevenue)} / mo
-• Annualized Run-Rate: $${formatNumber(metrics.totalProjectedRevenue * 12)} / yr
+• Total Monthly Operating Cost: $${formatNumber(metrics.totalCost)} / mo
+• Net Operating Profit: $${formatNumber(metrics.netProfit)} / mo (${metrics.netMarginPct}% Net Margin)
+• Annualized Revenue Run-Rate: $${formatNumber(metrics.totalProjectedRevenue * 12)} / yr
 • Parameters: $${state.hourlyRate}/hr billing rate | ${state.utilization}% tech utilization | $${formatNumber(state.fixedRevenuePerMember)}/mo retainer`;
 
     if (typeof navigator !== "undefined" && navigator.clipboard) {

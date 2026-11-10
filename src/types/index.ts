@@ -14,6 +14,10 @@ export interface OrgState {
   hourlyRate: number;
   utilization: number;
   fixedRevenuePerMember: number;
+  // Cost & Profitability parameters
+  avgDevCost: number;
+  avgOpsCost: number;
+  overheadInfraCost: number;
 }
 
 export interface CalculatedMetrics {
@@ -32,4 +36,10 @@ export interface CalculatedMetrics {
   variableTechRevenue: number;
   fixedHiringRevenue: number;
   totalProjectedRevenue: number;
+  // Cost & Profit metrics
+  totalDevCost: number;
+  totalOpsCost: number;
+  totalCost: number;
+  netProfit: number;
+  netMarginPct: string;
 }

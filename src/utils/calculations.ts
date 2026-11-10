@@ -12,6 +12,10 @@ export const DEFAULT_ORG_STATE: OrgState = {
   hourlyRate: 25,
   utilization: 80,
   fixedRevenuePerMember: 3000,
+  // Cost assumptions (monthly payroll & overhead averages)
+  avgDevCost: 1800,
+  avgOpsCost: 1500,
+  overheadInfraCost: 5000,
 };
 
 /**
@@ -37,6 +41,9 @@ export function calculateMetrics(state: OrgState): CalculatedMetrics {
     hourlyRate,
     utilization,
     fixedRevenuePerMember,
+    avgDevCost = 1800,
+    avgOpsCost = 1500,
+    overheadInfraCost = 5000,
   } = state;
 
   // Split otherOps into sales (~2/3) and hr/accounts (~1/3)
@@ -63,6 +70,16 @@ export function calculateMetrics(state: OrgState): CalculatedMetrics {
   const fixedHiringRevenue = hiring * fixedRevenuePerMember;
   const totalProjectedRevenue = Math.round(variableTechRevenue + fixedHiringRevenue);
 
+  // Cost & Profit Margin Analysis
+  const totalDevCost = Math.round((hiring + totalTech) * avgDevCost);
+  const totalOpsCost = Math.round(totalOps * avgOpsCost);
+  const totalCost = Math.round(totalDevCost + totalOpsCost + overheadInfraCost);
+  const netProfit = totalProjectedRevenue - totalCost;
+  const netMarginPct =
+    totalProjectedRevenue > 0
+      ? ((netProfit / totalProjectedRevenue) * 100).toFixed(1)
+      : "0.0";
+
   return {
     sales,
     hrAcc,
@@ -79,5 +96,10 @@ export function calculateMetrics(state: OrgState): CalculatedMetrics {
     variableTechRevenue,
     fixedHiringRevenue,
     totalProjectedRevenue,
+    totalDevCost,
+    totalOpsCost,
+    totalCost,
+    netProfit,
+    netMarginPct,
   };
 }
