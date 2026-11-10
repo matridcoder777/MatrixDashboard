@@ -14,6 +14,16 @@ export const DEFAULT_ORG_STATE: OrgState = {
   fixedRevenuePerMember: 3000,
 };
 
+/**
+ * Deterministic number formatting to avoid SSR vs Client locale mismatches (e.g. en-US vs en-IN).
+ * Formats 207400 as "207,400" identically on both server and client.
+ */
+export function formatNumber(val: number): string {
+  if (isNaN(val) || val === null || val === undefined) return "0";
+  const rounded = Math.round(val);
+  return rounded.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function calculateMetrics(state: OrgState): CalculatedMetrics {
   const {
     custom,

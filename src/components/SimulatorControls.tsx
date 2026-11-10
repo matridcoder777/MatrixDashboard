@@ -8,10 +8,9 @@ import {
   Calculator,
   TrendingUp,
   Percent,
-  DollarSign,
-  Building2,
 } from "lucide-react";
 import { OrgState, CalculatedMetrics } from "@/types";
+import { formatNumber } from "@/utils/calculations";
 
 interface SimulatorControlsProps {
   state: OrgState;
@@ -41,11 +40,11 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
             Estimated Monthly Billable Revenue
           </span>
           <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 tracking-tight flex items-center justify-end gap-1">
-            <span>${metrics.totalProjectedRevenue.toLocaleString()}</span>
+            <span>${formatNumber(metrics.totalProjectedRevenue)}</span>
             <span className="text-xs font-normal text-slate-400">/ mo</span>
           </div>
           <span className="text-[10px] text-emerald-500/90 font-medium">
-            ≈ ${(metrics.totalProjectedRevenue * 12).toLocaleString()} / yr run-rate
+            ≈ ${formatNumber(metrics.totalProjectedRevenue * 12)} / yr run-rate
           </span>
         </div>
       </div>
@@ -315,7 +314,7 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
               <div className="flex justify-between text-xs text-slate-300 mb-1.5">
                 <span className="font-medium">Fixed Rev / Dedicated Tech</span>
                 <span className="font-bold text-blue-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-                  ${state.fixedRevenuePerMember.toLocaleString()} / mo
+                  ${formatNumber(state.fixedRevenuePerMember)} / mo
                 </span>
               </div>
               <input
@@ -347,7 +346,7 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
                 <TrendingUp className="w-3.5 h-3.5 text-blue-400" /> Variable Tech Monthly:
               </span>
               <span className="font-bold text-white text-sm">
-                ${Math.round(metrics.variableTechRevenue).toLocaleString()}
+                ${formatNumber(metrics.variableTechRevenue)}
               </span>
             </div>
           </div>

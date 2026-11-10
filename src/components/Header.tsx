@@ -12,6 +12,7 @@ import {
   Printer,
 } from "lucide-react";
 import { CalculatedMetrics, OrgState } from "@/types";
+import { formatNumber } from "@/utils/calculations";
 
 interface HeaderProps {
   totalHeadcount: number;
@@ -42,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const toggleFullscreen = () => {
+    if (typeof document === "undefined") return;
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
     } else {
@@ -55,17 +57,21 @@ export const Header: React.FC<HeaderProps> = ({
 • Revenue Generating: ${metrics.revenueEarningCount} (${metrics.revPct}%) [${state.hiring} Fixed Dedicated + ${metrics.totalTech} Core Tech]
 • Overhead & Support: ${metrics.totalOps} (${metrics.opsPct}%) [PM: ${state.pm}, BA: ${state.ba}, Sales/Ops: ${metrics.sales + metrics.hrAcc}]
 • Dev-to-Management Ratio: ${metrics.devToMgmtRatio}:1
-• Estimated Monthly Revenue: $${metrics.totalProjectedRevenue.toLocaleString()} / mo
-• Annualized Run-Rate: $${(metrics.totalProjectedRevenue * 12).toLocaleString()} / yr
-• Parameters: $${state.hourlyRate}/hr billing rate | ${state.utilization}% tech utilization | $${state.fixedRevenuePerMember.toLocaleString()}/mo retainer`;
+• Estimated Monthly Revenue: $${formatNumber(metrics.totalProjectedRevenue)} / mo
+• Annualized Run-Rate: $${formatNumber(metrics.totalProjectedRevenue * 12)} / yr
+• Parameters: $${state.hourlyRate}/hr billing rate | ${state.utilization}% tech utilization | $${formatNumber(state.fixedRevenuePerMember)}/mo retainer`;
 
-    navigator.clipboard.writeText(summary);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(summary);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handlePrint = () => {
-    window.print();
+    if (typeof window !== "undefined") {
+      window.print();
+    }
   };
 
   return (

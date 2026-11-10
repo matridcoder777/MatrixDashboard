@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { DollarSign, Layers, CheckCircle2, TrendingUp, BarChart3 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
 import { OrgState, CalculatedMetrics } from "@/types";
+import { formatNumber } from "@/utils/calculations";
 
 interface FinancialSummaryTableProps {
   state: OrgState;
@@ -47,11 +48,11 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
             Fixed Retainer Stream
           </span>
           <div className="text-xl font-bold text-emerald-400 mt-1">
-            ${metrics.fixedHiringRevenue.toLocaleString()}
+            ${formatNumber(metrics.fixedHiringRevenue)}
             <span className="text-xs font-normal text-slate-400"> / mo</span>
           </div>
           <span className="text-[11px] text-slate-400 mt-1 block">
-            {state.hiring} dedicated staff @ ${state.fixedRevenuePerMember.toLocaleString()}/mo
+            {state.hiring} dedicated staff @ ${formatNumber(state.fixedRevenuePerMember)}/mo
           </span>
         </div>
 
@@ -60,7 +61,7 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
             Variable Tech Stream
           </span>
           <div className="text-xl font-bold text-indigo-400 mt-1">
-            ${Math.round(metrics.variableTechRevenue).toLocaleString()}
+            ${formatNumber(metrics.variableTechRevenue)}
             <span className="text-xs font-normal text-slate-400"> / mo</span>
           </div>
           <span className="text-[11px] text-slate-400 mt-1 block">
@@ -73,11 +74,11 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
             Avg Yield / Org Head
           </span>
           <div className="text-xl font-bold text-white mt-1">
-            ${avgRevPerEmployee.toLocaleString()}
+            ${formatNumber(avgRevPerEmployee)}
             <span className="text-xs font-normal text-slate-400"> / mo</span>
           </div>
           <span className="text-[11px] text-slate-400 mt-1 block">
-            Blended across all 83 team members
+            Blended across all {metrics.totalHeadcount} team members
           </span>
         </div>
 
@@ -86,11 +87,11 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
             Avg Yield / Billable Head
           </span>
           <div className="text-xl font-bold text-cyan-400 mt-1">
-            ${avgRevPerBillable.toLocaleString()}
+            ${formatNumber(avgRevPerBillable)}
             <span className="text-xs font-normal text-slate-400"> / mo</span>
           </div>
           <span className="text-[11px] text-slate-400 mt-1 block">
-            Excludes 16 overhead staff members
+            Excludes {metrics.totalOps} overhead staff members
           </span>
         </div>
       </div>
@@ -117,10 +118,10 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
               <td className="px-4 py-3.5">{state.hiring} members</td>
               <td className="px-4 py-3.5">Dedicated SLA</td>
               <td className="px-4 py-3.5 font-bold text-emerald-400">
-                ${metrics.fixedHiringRevenue.toLocaleString()}
+                ${formatNumber(metrics.fixedHiringRevenue)}
               </td>
               <td className="px-4 py-3.5">
-                ${(metrics.fixedHiringRevenue * 12).toLocaleString()}
+                ${formatNumber(metrics.fixedHiringRevenue * 12)}
               </td>
               <td className="px-4 py-3.5 text-slate-400">
                 {metrics.totalProjectedRevenue > 0
@@ -135,13 +136,13 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
               </td>
               <td className="px-4 py-3.5">{metrics.totalTech} devs</td>
               <td className="px-4 py-3.5">
-                {Math.round(metrics.totalTech * metrics.billableHoursPerMonth).toLocaleString()} billable hrs
+                {formatNumber(metrics.totalTech * metrics.billableHoursPerMonth)} billable hrs
               </td>
               <td className="px-4 py-3.5 font-bold text-indigo-400">
-                ${Math.round(metrics.variableTechRevenue).toLocaleString()}
+                ${formatNumber(metrics.variableTechRevenue)}
               </td>
               <td className="px-4 py-3.5">
-                ${Math.round(metrics.variableTechRevenue * 12).toLocaleString()}
+                ${formatNumber(metrics.variableTechRevenue * 12)}
               </td>
               <td className="px-4 py-3.5 text-slate-400">
                 {metrics.totalProjectedRevenue > 0
@@ -157,10 +158,10 @@ export const FinancialSummaryTable: React.FC<FinancialSummaryTableProps> = ({
               <td className="px-4 py-3.5">{metrics.revenueEarningCount} billable</td>
               <td className="px-4 py-3.5">-</td>
               <td className="px-4 py-3.5 text-emerald-400 text-sm">
-                ${metrics.totalProjectedRevenue.toLocaleString()}
+                ${formatNumber(metrics.totalProjectedRevenue)}
               </td>
               <td className="px-4 py-3.5 text-blue-400 text-sm">
-                ${(metrics.totalProjectedRevenue * 12).toLocaleString()}
+                ${formatNumber(metrics.totalProjectedRevenue * 12)}
               </td>
               <td className="px-4 py-3.5 text-slate-300">100.0%</td>
             </tr>
