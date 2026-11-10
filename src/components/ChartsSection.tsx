@@ -16,7 +16,7 @@ import {
 import { PieChart, Laptop, Network } from "lucide-react";
 import { OrgState, CalculatedMetrics } from "@/types";
 
-// Register Chart.js components
+// Register Chart.js components once
 ChartJS.register(
   ArcElement,
   BarElement,
@@ -42,12 +42,19 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ state, metrics }) 
   const techChartInstance = useRef<ChartJS | null>(null);
   const opsChartInstance = useRef<ChartJS | null>(null);
 
-  // Initialize and update Main Distribution Chart
+  // 1. High-Level Allocation Donut Chart
   useEffect(() => {
-    if (!mainCanvasRef.current) return;
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
 
-    if (!mainChartInstance.current) {
-      const ctx = mainCanvasRef.current.getContext("2d");
+    // If chart doesn't exist or its canvas was changed/detached, re-create it
+    if (!mainChartInstance.current || mainChartInstance.current.canvas !== canvas) {
+      if (mainChartInstance.current) {
+        mainChartInstance.current.destroy();
+        mainChartInstance.current = null;
+      }
+
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       mainChartInstance.current = new ChartJS(ctx, {
@@ -100,25 +107,39 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ state, metrics }) 
         },
       });
     } else {
-      mainChartInstance.current.data.datasets[0].data = [
-        state.hiring,
-        metrics.totalTech,
-        metrics.totalOps,
-      ];
-      mainChartInstance.current.update();
+      try {
+        mainChartInstance.current.data.datasets[0].data = [
+          state.hiring,
+          metrics.totalTech,
+          metrics.totalOps,
+        ];
+        mainChartInstance.current.update();
+      } catch (e) {
+        mainChartInstance.current.destroy();
+        mainChartInstance.current = null;
+      }
     }
 
     return () => {
-      // Clean up on component unmount
+      if (mainChartInstance.current) {
+        mainChartInstance.current.destroy();
+        mainChartInstance.current = null;
+      }
     };
   }, [state.hiring, metrics.totalTech, metrics.totalOps]);
 
-  // Initialize and update Tech Breakdown Chart
+  // 2. Core Tech Breakdown Bar Chart
   useEffect(() => {
-    if (!techCanvasRef.current) return;
+    const canvas = techCanvasRef.current;
+    if (!canvas) return;
 
-    if (!techChartInstance.current) {
-      const ctx = techCanvasRef.current.getContext("2d");
+    if (!techChartInstance.current || techChartInstance.current.canvas !== canvas) {
+      if (techChartInstance.current) {
+        techChartInstance.current.destroy();
+        techChartInstance.current = null;
+      }
+
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       techChartInstance.current = new ChartJS(ctx, {
@@ -166,22 +187,40 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ state, metrics }) 
         },
       });
     } else {
-      techChartInstance.current.data.datasets[0].data = [
-        state.custom,
-        state.design,
-        state.mobile,
-        state.wordpress,
-      ];
-      techChartInstance.current.update();
+      try {
+        techChartInstance.current.data.datasets[0].data = [
+          state.custom,
+          state.design,
+          state.mobile,
+          state.wordpress,
+        ];
+        techChartInstance.current.update();
+      } catch (e) {
+        techChartInstance.current.destroy();
+        techChartInstance.current = null;
+      }
     }
+
+    return () => {
+      if (techChartInstance.current) {
+        techChartInstance.current.destroy();
+        techChartInstance.current = null;
+      }
+    };
   }, [state.custom, state.design, state.mobile, state.wordpress]);
 
-  // Initialize and update Operations Breakdown Chart
+  // 3. Operations Breakdown Donut Chart
   useEffect(() => {
-    if (!opsCanvasRef.current) return;
+    const canvas = opsCanvasRef.current;
+    if (!canvas) return;
 
-    if (!opsChartInstance.current) {
-      const ctx = opsCanvasRef.current.getContext("2d");
+    if (!opsChartInstance.current || opsChartInstance.current.canvas !== canvas) {
+      if (opsChartInstance.current) {
+        opsChartInstance.current.destroy();
+        opsChartInstance.current = null;
+      }
+
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       opsChartInstance.current = new ChartJS(ctx, {
@@ -239,25 +278,28 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({ state, metrics }) 
         },
       });
     } else {
-      opsChartInstance.current.data.datasets[0].data = [
-        state.pm,
-        metrics.sales,
-        state.ba,
-        metrics.hr,
-        metrics.accounts,
-      ];
-      opsChartInstance.current.update();
+      try {
+        opsChartInstance.current.data.datasets[0].data = [
+          state.pm,
+          metrics.sales,
+          state.ba,
+          metrics.hr,
+          metrics.accounts,
+        ];
+        opsChartInstance.current.update();
+      } catch (e) {
+        opsChartInstance.current.destroy();
+        opsChartInstance.current = null;
+      }
     }
-  }, [state.pm, metrics.sales, state.ba, metrics.hr, metrics.accounts]);
 
-  // Clean up all charts on unmount
-  useEffect(() => {
     return () => {
-      mainChartInstance.current?.destroy();
-      techChartInstance.current?.destroy();
-      opsChartInstance.current?.destroy();
+      if (opsChartInstance.current) {
+        opsChartInstance.current.destroy();
+        opsChartInstance.current = null;
+      }
     };
-  }, []);
+  }, [state.pm, metrics.sales, state.ba, metrics.hr, metrics.accounts]);
 
   // Calculate percentage of tech team for legend label
   const customPct = metrics.totalTech > 0 ? ((state.custom / metrics.totalTech) * 100).toFixed(1) : "0";
