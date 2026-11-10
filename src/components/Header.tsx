@@ -1,10 +1,22 @@
 "use client";
 
-import React from "react";
-import { PieChart, Sparkles, SlidersHorizontal, RefreshCw } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  PieChart,
+  SlidersHorizontal,
+  RefreshCw,
+  Maximize2,
+  Minimize2,
+  Copy,
+  Check,
+  Printer,
+} from "lucide-react";
+import { CalculatedMetrics, OrgState } from "@/types";
 
 interface HeaderProps {
   totalHeadcount: number;
+  metrics: CalculatedMetrics;
+  state: OrgState;
   onReset: () => void;
   activePreset: string;
   onSelectPreset: (preset: string) => void;
@@ -12,12 +24,52 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   totalHeadcount,
+  metrics,
+  state,
   onReset,
   activePreset,
   onSelectPreset,
 }) => {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  const handleCopySummary = () => {
+    const summary = `📊 IT Resource & ROI Executive Summary
+• Total Workforce: ${totalHeadcount} Members (100% capacity)
+• Revenue Generating: ${metrics.revenueEarningCount} (${metrics.revPct}%) [${state.hiring} Fixed Dedicated + ${metrics.totalTech} Core Tech]
+• Overhead & Support: ${metrics.totalOps} (${metrics.opsPct}%) [PM: ${state.pm}, BA: ${state.ba}, Sales/Ops: ${metrics.sales + metrics.hrAcc}]
+• Dev-to-Management Ratio: ${metrics.devToMgmtRatio}:1
+• Estimated Monthly Revenue: $${metrics.totalProjectedRevenue.toLocaleString()} / mo
+• Annualized Run-Rate: $${(metrics.totalProjectedRevenue * 12).toLocaleString()} / yr
+• Parameters: $${state.hourlyRate}/hr billing rate | ${state.utilization}% tech utilization | $${state.fixedRevenuePerMember.toLocaleString()}/mo retainer`;
+
+    navigator.clipboard.writeText(summary);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <header className="border-b border-borderbg bg-cardbg/80 backdrop-blur-md sticky top-0 z-50">
+    <header className="border-b border-borderbg bg-cardbg/80 backdrop-blur-md sticky top-0 z-50 print:hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         {/* Brand & Title */}
         <div className="flex items-center space-x-3.5">
@@ -88,9 +140,51 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
+          {/* Copy Summary Button */}
+          <button
+            onClick={handleCopySummary}
+            title="Copy Executive Summary to Clipboard"
+            className="text-xs bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 flex items-center gap-1.5 transition"
+          >
+            {copied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400 font-medium">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-slate-400" />
+                <span className="hidden sm:inline">Copy Brief</span>
+              </>
+            )}
+          </button>
+
+          {/* Print / Export Button */}
+          <button
+            onClick={handlePrint}
+            title="Export / Print Dashboard"
+            className="text-xs bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white p-1.5 rounded-lg border border-slate-800 transition hidden sm:flex items-center justify-center"
+          >
+            <Printer className="w-4 h-4 text-slate-400" />
+          </button>
+
+          {/* Fullscreen Presentation Mode Button */}
+          <button
+            onClick={toggleFullscreen}
+            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Presentation Mode"}
+            className="text-xs bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white p-1.5 rounded-lg border border-slate-800 transition flex items-center justify-center"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-4 h-4 text-blue-400" />
+            ) : (
+              <Maximize2 className="w-4 h-4 text-slate-400" />
+            )}
+          </button>
+
+          {/* Active Model Indicator */}
           <div className="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-full border border-emerald-500/20 font-medium flex items-center gap-2 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="font-semibold">Dynamic Model Active</span>
+            <span className="font-semibold hidden sm:inline">Dynamic Model</span> Active
           </div>
         </div>
       </div>
